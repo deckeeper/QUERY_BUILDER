@@ -1,0 +1,118 @@
+<html>
+<head>
+    <link rel="stylesheet" href="sakura.css">
+    <link rel="icon" href="database_icon.png" sizes="32x32">
+    <link rel="icon" href="database_icon.png" sizes="57x57">
+    <link rel="icon" href="database_icon.png" sizes="76x76">
+    <link rel="icon" href="database_icon.png" sizes="96x96">
+    <link rel="icon" href="database_icon.png" sizes="128x128">
+    <link rel="icon" href="database_icon.png" sizes="192x192">
+    <link rel="icon" href="database_icon.png" sizes="228x228">
+</head>
+    <h3>MYSQL QUERY BUILDER</h3>
+    <select id="sql_function" onchange="show()">
+        <option value="SELECT">SELECT</option>
+        <option value="UPDATE">UPDATE</option>
+    </select>
+    <select id="update_properties" style="display:none;" onchange="choose_update()">
+        <option value="static_update">Static Update</option>
+        <option value="dynamic_update">Dynamic Update</option>
+    </select>
+    <input type="text" name="database" id="database" value="" placeholder="Database Name" </>
+    <input type="text" name="where" id="where" value="" placeholder="Where"</>
+    <input type="text" name="field_update" id="field_update" value="" placeholder="Field To Update" style="display:none;"</>
+    <input type="text" name="value_update" id="value_update" value="" placeholder="Value to Update" style="display:none;"</>
+    <br><br>
+    <textarea cols="30" rows="5" placeholder="Values" id="option_values"></textarea>
+    <br><br>
+    <textarea cols="30" rows="5" placeholder="Update Values" id="update_values" style="display:none;"></textarea>
+    <br><br>
+    <button id="submit" name="submit">Create Query</button>
+    <br><br>
+    <textarea cols="30" rows="5" placeholder="Result" id="result"></textarea>
+</html>
+
+
+
+<script>
+
+document.getElementById("submit").addEventListener("click", create_query);
+
+function show() {
+    if(document.getElementById("sql_function").value=='UPDATE'){
+        document.getElementById("field_update").style.display = 'block';
+        document.getElementById("value_update").style.display = 'block';
+        document.getElementById("update_properties").style.display = 'block';
+    }
+    else{
+        document.getElementById("field_update").style.display = 'none';
+        document.getElementById("value_update").style.display = 'none';
+        document.getElementById("update_properties").style.display = 'none';
+	document.getElementById("update_values").style.display = 'none';
+    }
+}
+
+function choose_update() {
+    if(document.getElementById("update_properties").value=='dynamic_update'){
+        document.getElementById("value_update").style.display = 'none';
+        document.getElementById("update_values").style.display = 'block';
+    }
+    else{
+        document.getElementById("value_update").style.display = 'block';
+        document.getElementById("update_values").style.display = 'none';
+    }
+}
+
+function create_query() {
+  if(document.getElementById("sql_function").value=='SELECT'){
+    var values = document.getElementById("option_values").value.split("\n");
+    var text = '';
+    for (var i =0; i < values.length; i++) {
+    
+        if (i==0){
+        var query = 'SELECT * FROM '+document.getElementById('database').value+' WHERE '+document.getElementById('where').value+' IN ("'+values[i]+'",';
+		text = text + query +"\n";
+    }
+    else if(i==values.length-1){
+        var query = '"'+values[i]+'");';
+	    text = text + query +"\n";
+    }
+    else{
+        var query = '"'+values[i]+'",';
+	    text = text + query +"\n";
+    }
+    
+}
+document.getElementById('result').value=text;
+  }
+  else if(document.getElementById("sql_function").value=='UPDATE'){
+    var values = document.getElementById("option_values").value.split("\n");
+    var text = '';
+    
+
+if(document.getElementById("update_properties").value=='dynamic_update'){
+    var values_update = document.getElementById("update_values").value.split("\n");
+    for (var i =0; i < values.length; i++) {
+
+    var query = 'UPDATE '+document.getElementById('database').value+' SET '+document.getElementById('field_update').value+'="'+values_update[i]+'" WHERE '+document.getElementById('where').value+'="'+values[i]+'";';
+    text = text + query +"\n";
+
+
+}
+}
+
+else{
+    for (var i =0; i < values.length; i++) {
+    
+
+    var query = 'UPDATE '+document.getElementById('database').value+' SET '+document.getElementById('field_update').value+'="'+document.getElementById('value_update').value+'" WHERE '+document.getElementById('where').value+'="'+values[i]+'";';
+    text = text + query +"\n";
+
+
+}
+}
+document.getElementById('result').value=text;
+  }
+}    
+
+</script>
